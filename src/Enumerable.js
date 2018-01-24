@@ -4,25 +4,32 @@ class Enumerable {
   }
 
   select(fn) {
-    this.collection = this.collection.map(fn);
-    return this;
+    // BEGIN (write your solution here)
+    const mapped = this.collection.map(fn);
+    return new Enumerable(mapped);
+    // END
   }
 
-  orderBy(fn, order = 'asc') {    
-    this.collection.sort((a, b) => {
-      if (order === 'desc') return fn(a) < fn(b) ? 1 : -1;
-      return fn(a) > fn(b) ? 1 : -1;
-    });
-    return this;
+  orderBy(fn, direction = 'asc') {
+    // BEGIN (write your solution here)
+    const result = this.collection.slice().sort(
+      (a, b) => {
+        if (direction === 'desc') return fn(a) < fn(b) ? 1 : -1;
+        return fn(a) > fn(b) ? 1 : -1;
+      }
+    );
+
+    return new Enumerable(result);
+    // END
   }
 
   where(fn) {
-    this.collection = this.collection.filter(fn);
-    return this;
+    const filtered = this.collection.filter(fn);
+    return new Enumerable(filtered);
   }
 
   toArray() {
-    return this.collection.slice();
+    return this.collection;
   }
 }
 
