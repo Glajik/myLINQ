@@ -1,35 +1,38 @@
 class Enumerable {
-  constructor(collection) {
+  constructor(collection, operations) {
     this.collection = collection;
+		this.operations = operations || [];
   }
 
   select(fn) {
-    // BEGIN (write your solution here)
-    const mapped = this.collection.map(fn);
-    return new Enumerable(mapped);
-    // END
+		const newOps = this.operations.slice();
+		const selecting = collection => collection.map(fn);	
+		newOps.push(selecting);
+    return new Enumerable(this.collection.slice(), newOps);
   }
 
   orderBy(fn, direction = 'asc') {
-    // BEGIN (write your solution here)
-    const result = this.collection.slice().sort(
+		const newOps = this.operations.slice();
+    const orderingBy = collection => collection.sort(
       (a, b) => {
         if (direction === 'desc') return fn(a) < fn(b) ? 1 : -1;
         return fn(a) > fn(b) ? 1 : -1;
       }
     );
-
-    return new Enumerable(result);
-    // END
+		newOps.push(orderingBy);
+    return new Enumerable(this.collection.slice(), newOps);
   }
 
   where(fn) {
-    const filtered = this.collection.filter(fn);
-    return new Enumerable(filtered);
+		const newOps = this.operations.slice();
+		const filtering = collection => collection.filter(fn);
+		newOps.push(filtering);
+    return new Enumerable(this.collection.slice(), newOps);
   }
 
   toArray() {
-    return this.collection;
+		const newCollection = this.operations.reduce((result, func) => func(result).slice(), this.collection.slice());
+    return newCollection;
   }
 }
 
