@@ -1,5 +1,6 @@
 # My implementation of LINQ
 Implement a LINQ interface for work with collections, see class Enumerable.
+Methods select(), where() and orderBy() implements lazy access (lazy evalutions).
 
 It's training project on ES-2016, which I made by [Hexlet](https://ru.hexlet.io/?ref=161019) cources.
 All right reserved by Hexlet(c)
