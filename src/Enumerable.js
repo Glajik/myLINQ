@@ -3,36 +3,46 @@ class Enumerable {
     this.collection = collection;
 		this.operations = operations || [];
   }
+	
+	build(fn) {
+		const newOps = this.operations.slice();
+		newOps.push(fn);
+		return new Enumerable(this.collection.slice(), newOps);
+	}
 
   select(fn) {
-		const newOps = this.operations.slice();
 		const selecting = collection => collection.map(fn);	
-		newOps.push(selecting);
-    return new Enumerable(this.collection.slice(), newOps);
+    return this.build(selecting);
   }
 
   orderBy(fn, direction = 'asc') {
-		const newOps = this.operations.slice();
     const orderingBy = collection => collection.sort(
       (a, b) => {
         if (direction === 'desc') return fn(a) < fn(b) ? 1 : -1;
         return fn(a) > fn(b) ? 1 : -1;
       }
     );
-		newOps.push(orderingBy);
-    return new Enumerable(this.collection.slice(), newOps);
+    return this.build(orderingBy);
   }
 
   where(fn) {
-		const newOps = this.operations.slice();
 		const filtering = collection => collection.filter(fn);
-		newOps.push(filtering);
-    return new Enumerable(this.collection.slice(), newOps);
+    return this.build(filtering);
   }
 
   toArray() {
-		const newCollection = this.operations.reduce((result, func) => func(result).slice(), this.collection.slice());
-    return newCollection;
+    if (!this.memo) {
+      this.memo = this.operations.reduce(
+				(result, func) => func(result).slice(), 
+				this.collection.slice()
+			);
+    }
+    return this.memo;
+  }
+
+  get length() {
+    const result = this.toArray();
+    return result.length;
   }
 }
 
