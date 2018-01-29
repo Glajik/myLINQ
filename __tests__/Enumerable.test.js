@@ -15,59 +15,30 @@ describe('HexletLinq', () => {
     coll = new Enumerable(cars);
   });
 
-  it('should be immutable', () => {
-    coll.orderBy(car => car.year, 'asc').toArray();
-    const result = coll.where(car => car.brand === 'kia')
-      .where(car => car.year > 2011);
-
-    expect(result.toArray()).toEqual(result.memo);
-  });
-
-  it('should be immutable 2', () => {
-    const result = coll
-      .where(car => car.brand === 'kia')
-      .where(car => car.year > 2011);
-
-    const result2 = coll
-      .orderBy(car => car.year, 'asc')
-      .where(car => car.model === 'sorento');
-    expect(result2.length).toBe(1);
-    expect(result2.length).toBe(1);
-
-    expect(result.length).toBe(2);
-    expect(result.toArray()).toEqual(result.memo);
-    expect(result.toArray()).toEqual([cars[2], cars[4]]);
-  });
-
   it('#where', () => {
     const result = coll
       .where(car => car.brand === 'kia')
       .where(car => car.year > 2011);
 
-    expect(result.length).toBe(2);
     expect(result.toArray()).toEqual([cars[2], cars[4]]);
+
+    const result2 = coll.where({ brand: 'bmw' });
+    expect(result2.toArray()).toEqual([cars[0], cars[1]]);
+
+    const result3 = coll.where({ brand: 'kia', model: 'sorento' });
+    expect(result3.toArray()).toEqual([cars[2]]);
+
+    const result4 = coll.where({ brand: 'kia' }, car => car.year < 2013);
+    expect(result4.toArray()).toEqual([cars[3], cars[4]]);
+
+    const result5 = coll.where({ year: 2009 });
+    expect(result5.toArray()).toEqual([]);
   });
 
-  it('#select', () => {
-    const result = coll.where(car => car.brand === 'bmw').select(car => car.model);
+  it('#where 2', () => {
+    const result = coll.where(car => car.year < 2014)
+      .where(car => car.brand === 'kia', car => car.year > 2011);
 
-    expect(result.length).toBe(2);
-    expect(result.toArray()).toEqual(result.memo);
-  });
-
-  it('#orderBy', () => {
-    const result = coll.orderBy(car => car.year)
-      .where(car => car.brand === 'kia')
-      .select(car => car.model);
-
-    expect(result.length).toBe(3);
-    expect(result.toArray()).toEqual(['rio', 'sportage', 'sorento']);
-
-    const result2 = coll.orderBy(car => car.year, 'desc')
-      .where(car => car.brand === 'kia')
-      .select(car => car.model);
-
-    expect(result2.length).toBe(3);
-    expect(result2.toArray()).toEqual(result2.memo);
+    expect(result.toArray()).toEqual([cars[4]]);
   });
 });
