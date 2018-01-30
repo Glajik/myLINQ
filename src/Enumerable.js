@@ -9,27 +9,17 @@ class Enumerable {
   }
 
   // BEGIN (write your solution here)
-  where(...args) {
-    let listOps = [];
-    args.forEach(fn => {
-      if (typeof(fn) === 'function') {
-        listOps.push(coll => 
-          coll.filter(el => 
-            fn(el)
-          )
-        );
-      } else {
-        Object.keys(fn).forEach(key =>
-          listOps.push(coll => 
-            coll.filter(el => 
-              el[key] === fn[key]
-            )
-          )
-        );
+	where(...predicates) {
+    const fns = predicates.map((predicate) => {
+      if (typeof predicate === 'function') {
+        return coll => coll.filter(predicate);
       }
-    },
-    this);
-    return this.build(listOps);
+
+      const keys = Object.keys(predicate);
+      return coll => coll.filter(element =>
+        keys.every(key => predicate[key] === element[key]));
+    });
+    return this.build(fns);
   }
   // END
 
